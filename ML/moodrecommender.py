@@ -1,3 +1,5 @@
+#DO NOT USE THIS SCRIPT YET
+#Bad accuracy for rn
 #New Idea
 # What if score both the lyrics of a song and melody of a song to get emotion
 # Might be better though to use lyrics as a prime factor???
