@@ -6,11 +6,12 @@ from genius import getLyrics
 from dotenv import load_dotenv
 import os
 import json
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../frontend/dist/assets")
+
 load_dotenv()
 # Spotify OAuth setup
-os.environ['SPOTIPY_CLIENT_ID'] = 'f6f49efa164b4b1a9e5018bf7274ac90'
-os.environ['SPOTIPY_CLIENT_SECRET'] = 'cddeff85c6d842b4b86c0aa0ede8ed63'
+os.environ['SPOTIPY_CLIENT_ID'] = '2e63dd29a94e4ef09edd353833d943c2'
+os.environ['SPOTIPY_CLIENT_SECRET'] = '3e1d0d96d50a48f7ae7f2425f8b5101d'
 sp_oauth = SpotifyOAuth(client_id=os.environ['SPOTIPY_CLIENT_ID'],
                         client_secret=os.environ['SPOTIPY_CLIENT_SECRET'],
                         redirect_uri="http://127.0.0.1:8888/callback",
@@ -46,8 +47,9 @@ def get_playlist_emotion():
     print(len(songs))
     print("HELLLO")
     return json.dumps({
-  "playlists": songs
-})
+        "playlists": songs
+    })
+
 def iterate_songs(sp, playlists):
     happy = []
     sad = []
