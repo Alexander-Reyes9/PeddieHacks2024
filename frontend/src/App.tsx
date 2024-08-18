@@ -3,7 +3,15 @@ import spotifyLogo from './assets/spotify_logo.png'
 import './App.css'
 
 async function fetchApi(playlistLink: string) {
-    return playlistLink
+    const response = await fetch('http://127.0.0.1:5000/get_playlist_emotion', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ playlistLink }),
+    });
+    const data = await response.json();
+    return data.emotion;
 }
 
 function EmotionDisplay({ emotion }: { emotion: string | null }){
