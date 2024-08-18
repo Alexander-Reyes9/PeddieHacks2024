@@ -11,19 +11,7 @@ async function fetchApi(playlistLink: string) {
         body: JSON.stringify({ playlistLink }),
     });
     const data = await response.json();
-    return data.emotion;
-}
-
-function EmotionDisplay({ emotion }: { emotion: string | null }){
-    if (!emotion){
-        return (
-            null
-        )
-    }else{
-        return (
-            <h2>{emotion}</h2>
-        )
-    }
+    return data.playlists;
 }
 
 function Playlist({ name, songList}: { name: string, songList: Array<string>}){
@@ -37,8 +25,14 @@ function Playlist({ name, songList}: { name: string, songList: Array<string>}){
     )
 }
 
+type PlaylistType = {
+    name: string,
+    songList: Array<string>
+}
+
 function App() {
-    const [emotion, setEmotion] = useState<string | null>(null)
+    const [playlists, setPlaylists] = useState<Array<PlaylistType> | null>(null)
+    const playlistElements = playlists?.map(playlist => { <Playlist name={playlist.name} songList={playlist.songList} /> })
 
     return (
         <div className="grid place-items-center">
@@ -46,10 +40,11 @@ function App() {
             <h1 className="text-5xl font-bold">Song Emotion Website</h1>
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 m-5 rounded" onClick={async () => {
                 let input = document.getElementById("playlistLink") as HTMLInputElement
-                setEmotion(await fetchApi(input.value))
+                setPlaylists(await fetchApi(input.value))
             }}>Generate emotion playlists</button>
             <div className="">
                 <ul className="grid gap-4 grid-cols-4">
+                    {playlistElements}
                     <Playlist name="Sad playlist" songList={['Test song 1', 'Test song 2', 'Test song 3']}/>
                     <Playlist name="Happy playlist" songList={['Test song 1', 'Test song 2', 'Test song 3']}/>
                     <Playlist name="IDK playlist" songList={['Test song 1', 'Test song 2', 'Test song 3']}/>
@@ -57,7 +52,6 @@ function App() {
                     <Playlist name="IDK playlist" songList={['Test song 1', 'Test song 2', 'Test song 3']}/>
                     <Playlist name="IDK playlist" songList={['Test song 1', 'Test song 2', 'Test song 3']}/>
                 </ul>
-                <EmotionDisplay emotion={emotion} />
             </div>
         </div>
     )
