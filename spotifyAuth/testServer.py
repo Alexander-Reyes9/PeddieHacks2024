@@ -1,18 +1,18 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, send_file
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from emotext import output
 from genius import getLyrics
-app = Flask(__name__)
+from dotenv import load_dotenv
+import os
+import json
+load_dotenv()
 
-# Load client ID and secret from file
-with open('secrets.txt', 'r') as fileReader:
-    clientID = fileReader.readline().strip()
-    clientSecret = fileReader.readline().strip()
+app = Flask(__name__, static_folder="../frontend/dist/assets")
 
 # Spotify OAuth setup
-sp_oauth = SpotifyOAuth(client_id=clientID,
-                        client_secret=clientSecret,
+sp_oauth = SpotifyOAuth(client_id=os.environ["SPOTIPY_CLIENT_ID"],
+                        client_secret=os.environ["SPOTIPY_CLIENT_SECRET"],
                         redirect_uri="http://127.0.0.1:8888/callback",
                         scope="playlist-read-private")
 
@@ -27,29 +27,35 @@ def callback():
     # Get the access token from Spotify
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)  # Retrieve the token info
-
     if not token_info:
         return "Authorization failed."
 
     # Use the token to access Spotify data
-    sp = spotipy.Spotify(auth=token_info['access_token'])
+    sp = spotipy.Spotify(auth=token_info["access_token"], )
 
-    # Get the current user information
-    current_user = sp.current_user()
+    return send_file("../frontend/dist/index.html")
+
+@app.route("/get_playlist_emotion", methods=["POST"])
+def get_playlist_emotion():
+    code = request.referrer.split("code=")[1]
+    token_info = sp_oauth.get_access_token(code)
+    sp = spotipy.Spotify(auth=token_info["access_token"])
     playlists = sp.current_user_playlists()
 
-    # Iterate through songs and display them
-    iterate_songs(sp, playlists)
-
-    return "Check your console for playlist details."
+    print(token_info)
+    songs = iterate_songs(sp, playlists)
+    print(len(songs))
+    return json.dumps({
+        "emotion": songs
+    })
 
 def iterate_songs(sp, playlists):
+    all_tracks = []
     for playlist in playlists['items']:
         playlist_name = playlist['name']
         playlist_id = playlist['id']
 
         print(f"Playlist: {playlist_name}")
-
         # Get all tracks in the playlist
         tracks = sp.playlist_tracks(playlist_id)
 
