@@ -1,8 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 text = "https://genius.com/"
-# "https://genius.com/Kendrick-lamar-not-like-us-lyrics"
-# Format of the song
 def generate_genius_url(artist: str, song_name: str) -> str:
     # Convert artist name and song name to lowercase and replace spaces with hyphens
     artist_slug = artist.lower().replace(' ', '-')
@@ -27,4 +25,3 @@ def getLyrics (artist, name):
         lyrics += split_text
 
     return "\n".join(lyrics)
-#print(getLyrics('Imagine Dragons', 'Radioactive'))
