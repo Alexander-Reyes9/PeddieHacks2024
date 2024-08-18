@@ -1,17 +1,15 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, send_file
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-app = Flask(__name__)
-
-# Load client ID and secret from file
-with open('secrets.txt', 'r') as fileReader:
-    clientID = fileReader.readline().strip()
-    clientSecret = fileReader.readline().strip()
+app = Flask(__name__, static_folder="../frontend/dist/assets")
 
 # Spotify OAuth setup
-sp_oauth = SpotifyOAuth(client_id=clientID,
-                        client_secret=clientSecret,
+sp_oauth = SpotifyOAuth(client_id=os.environ["SPOTIPY_CLIENT_ID"],
+                        client_secret=os.environ["SPOTIPY_CLIENT_SECRET"],
                         redirect_uri="http://127.0.0.1:8888/callback",
                         scope="playlist-read-private")
 
@@ -26,21 +24,20 @@ def callback():
     # Get the access token from Spotify
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)  # Retrieve the token info
-
     if not token_info:
         return "Authorization failed."
 
     # Use the token to access Spotify data
-    sp = spotipy.Spotify(auth=token_info['access_token'])
+    sp = spotipy.Spotify(auth=token_info["access_token"], )
 
     # Get the current user information
     current_user = sp.current_user()
     playlists = sp.current_user_playlists()
 
     # Iterate through songs and display them
-    iterate_songs(sp, playlists)
+    #iterate_songs(sp, playlists)
 
-    return "Check your console for playlist details."
+    return send_file("../frontend/dist/index.html")
 
 def iterate_songs(sp, playlists):
     for playlist in playlists['items']:
