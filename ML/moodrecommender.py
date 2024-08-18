@@ -39,12 +39,10 @@ def extract_features(file_name):
     mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
     chroma = librosa.feature.chroma_stft(y=y, sr=sr)
     mel = librosa.feature.melspectrogram(y=y, sr=sr)
-    contrast = librosa.feature.spectral_contrast(y=y, sr=sr)
-
+    # contrast = librosa.feature.spectral_contrast(y=y, sr=sr)
+    mel = np.log1p(mel)
     # Combine the features into a single array
-    features = np.hstack([np.mean(mfccs, axis=1),                                                                                                                             np.mean(chroma, axis=1),
-                          np.mean(mel, axis=1),
-                          np.mean(contrast, axis=1)])
+    features = np.hstack([np.mean(mfccs, axis=1),np.mean(chroma, axis=1), np.mean(mel, axis=1)])
     return features
 features = []
 for file_name in data['Filename']:
@@ -56,7 +54,7 @@ X = np.array(features[:630])
 output=pd.read_csv('categories.txt')
 y = output.values[:630]
 y = y.ravel()
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=41)
 # Initialize the model
 model = RandomForestClassifier()
 
