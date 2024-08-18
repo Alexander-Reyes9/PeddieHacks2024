@@ -71,6 +71,6 @@ def iterate_songs(sp, playlists):
                 album_name = track_info['album']['name']
 
                 print(f"Song: {song_name} - Artists: {artist_names} - Album: {album_name}")
-                output(getlyrics(artist_names, song_name))
+                output(getLyrics(artist_names, song_name))
 if __name__ == '__main__':
     app.run(port=8888, debug=True)
