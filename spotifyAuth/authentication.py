@@ -10,8 +10,8 @@ app = Flask(__name__, static_folder="../frontend/dist/assets")
 
 load_dotenv()
 # Spotify OAuth setup
-os.environ['SPOTIPY_CLIENT_ID'] = '2e63dd29a94e4ef09edd353833d943c2'
-os.environ['SPOTIPY_CLIENT_SECRET'] = '3e1d0d96d50a48f7ae7f2425f8b5101d'
+os.environ['SPOTIPY_CLIENT_ID'] = 'f6f49efa164b4b1a9e5018bf7274ac90'
+os.environ['SPOTIPY_CLIENT_SECRET'] = 'cddeff85c6d842b4b86c0aa0ede8ed63'
 sp_oauth = SpotifyOAuth(client_id=os.environ['SPOTIPY_CLIENT_ID'],
                         client_secret=os.environ['SPOTIPY_CLIENT_SECRET'],
                         redirect_uri="http://127.0.0.1:8888/callback",
@@ -35,21 +35,19 @@ def callback():
     sp = spotipy.Spotify(auth=token_info["access_token"], )
 
     return send_file("../frontend/dist/index.html")
-
 @app.route("/get_playlist_emotion", methods=["POST"])
 def get_playlist_emotion():
     code = request.referrer.split("code=")[1]
     token_info = sp_oauth.get_access_token(code)
     sp = spotipy.Spotify(auth=token_info["access_token"])
     playlists = sp.current_user_playlists()
-
+    print(json.dumps)
     songs = iterate_songs(sp, playlists)
     print(len(songs))
-    print("HELLLO")
+    print(json.dumps({"playlists": songs}))
     return json.dumps({
         "playlists": songs
     })
-
 def iterate_songs(sp, playlists):
     happy = []
     sad = []
@@ -58,7 +56,6 @@ def iterate_songs(sp, playlists):
     for playlist in playlists['items']:
         playlist_name = playlist['name']
         playlist_id = playlist['id']
-
         print(f"Playlist: {playlist_name}")
         # Get all tracks in the playlist
         tracks = sp.playlist_tracks(playlist_id)
@@ -68,8 +65,8 @@ def iterate_songs(sp, playlists):
             song_name = track_info['name']
             artist_names = ', '.join([artist['name'] for artist in track_info['artists']])
             album_name = track_info['album']['name']
-            print("Test: " + currEmotion)
-            currEmotion = output(getLyrics(artist_names, track['name']))
+            currEmotion = output(getLyrics(artist_names, song_name))
+            print(currEmotion)
             if currEmotion == "Happy":
                 happy.append(f"{song_name} by {artist_names}")
             if currEmotion == "Sad" or currEmotion == "Fear":
