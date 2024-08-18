@@ -11,7 +11,10 @@ import text2emotion as emo
 # test = fileContent
 
 def output(text):
-    temp = emo.get_emotion(text)
-    highestVal = max(temp, key = temp.get)
-    print(emo.get_emotion(text))
-    print(highestVal)
+    if text is None or text.strip() == "":
+        print("Can't find lyrics for this song...")
+        return None
+    else:
+        temp = emo.get_emotion(text)
+        highestVal = max(temp, key = temp.get)
+        return highestVal

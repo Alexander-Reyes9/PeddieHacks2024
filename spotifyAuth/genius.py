@@ -26,4 +26,5 @@ def getLyrics (artist, name):
         split_text = element.decode_contents().split("<br/>")
         lyrics += split_text
 
-    print("\n".join(lyrics))
+    return "\n".join(lyrics)
+#print(getLyrics('Imagine Dragons', 'Radioactive'))
