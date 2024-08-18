@@ -1,6 +1,8 @@
 from flask import Flask, request, redirect, send_file
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from emotext import output
+from genius import getLyrics
 from dotenv import load_dotenv
 import os
 import json
@@ -56,16 +58,15 @@ def iterate_songs(sp, playlists):
         print(f"Playlist: {playlist_name}")
         # Get all tracks in the playlist
         tracks = sp.playlist_tracks(playlist_id)
-        
+
         for track in tracks['items']:
             track_info = track['track']
             song_name = track_info['name']
             artist_names = ', '.join([artist['name'] for artist in track_info['artists']])
             album_name = track_info['album']['name']
-            
-            #print(f"Song: {song_name} - Artists: {artist_names} - Album: {album_name}")
-            all_tracks.append(song_name)
-        
+
+            print(f"Song: {song_name} - Artists: {artist_names} - Album: {album_name}")
+
         # Handle pagination for playlists with more than 100 tracks
         while tracks['next']:
             tracks = sp.next(tracks)
@@ -74,10 +75,8 @@ def iterate_songs(sp, playlists):
                 song_name = track_info['name']
                 artist_names = ', '.join([artist['name'] for artist in track_info['artists']])
                 album_name = track_info['album']['name']
-                
-                #print(f"Song: {song_name} - Artists: {artist_names} - Album: {album_name}")
-                all_tracks.append(song_name)
 
-    return all_tracks
+                print(f"Song: {song_name} - Artists: {artist_names} - Album: {album_name}")
+                output(getLyrics(artist_names, song_name))
 if __name__ == '__main__':
     app.run(port=8888, debug=True)
